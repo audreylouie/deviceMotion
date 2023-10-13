@@ -45,7 +45,6 @@
                         if (permissionState === 'granted') {
                             // Permission granted, add devicemotion event listener
                             window.addEventListener("devicemotion", handleDeviceMotion);
-                            drawRectangles();
                         }
                     })
                     .catch(console.error);
