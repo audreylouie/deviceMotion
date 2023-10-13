@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Canvas</title>
+</head>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+    }
+    button{
+        font-size: 20px;
+        margin: 5px;
+        color: black;
+    }
+</style>
+<body>
+    <button id="permission">Motion Device</button>
+    <canvas id="theCanvas"></canvas>
+
+    <script>
+        let permissionButton = document.getElementById("permission");
+        var canvas = document.getElementById('theCanvas');
+        var c = canvas.getContext('2d');
+        permissionButton.addEventListener("click", permission); 
+        canvas.width = window.innerWidth; // canvas covers the whole width of screen
+        canvas.height = window.innerHeight; // canvas covers the whole height of screen
+
+        var rectangles = [];
+        var maxRectangles = 200;
+        var currentRectangle = 0;
+
+      
+        var arc = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            size: 30,
+            angle: 120,
+        };
+        // Request device motion permission
+        function permission(){
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            // Permission granted, add devicemotion event listener
+                            window.addEventListener("devicemotion", handleDeviceMotion);
+                            drawRectangles();
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                alert("Device motion event not detected.");
+            }
+        }
+
+       
+        function handleDeviceMotion(event) {
+            arc.x += event.accelerationIncludingGravity.x;
+            arc.y -= event.accelerationIncludingGravity.y;
+            if(currentRectangle < maxRectangles) {
+                c.save();
+                arc.angle += 4;
+                arc.size *= 1.04;
+                c.translate(arc.x, arc.y);
+                c.rotate(arc.angle * (Math.PI / 360));
+                c.beginPath();
+                c.lineWidth = arc.size / 25;
+                    if (currentRectangle % 2 == 0) {
+                        c.strokeStyle = "white";
+                    } else {
+                        c.strokeStyle = "black";
+                    }
+                c.strokeRect(-arc.size / 2, -arc.size / 2, arc.size, arc.size);
+                c.restore();
+
+                currentRectangle++;
+                
+                } 
+            requestAnimationFrame(handleDeviceMotion);
+        }
+        
+    </script>
+</body>
+</html>
